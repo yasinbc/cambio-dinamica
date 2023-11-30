@@ -6,8 +6,35 @@ import java.util.regex.Pattern;
 public class CambioMinimo {
 
     public static void main(String[] args) {
+        
         // Se inicializa una bandera para trazar la ejecución del algoritmo.
         boolean trazar = false;
+
+        if(args.length == 0){
+            // Datos de entrada locales.
+            int numeroDeMonedasLocal = 3;
+            int[] denominacionesLocal = {1, 3, 5};
+            int cantidadLocal = 4;
+
+            // Se llama al método darCambio para calcular la tabla dinámica.
+            int[][] tabla = darCambio(cantidadLocal, denominacionesLocal, trazar);
+
+            // Se obtiene la cantidad mínima de monedas necesarias.
+            int cantidadMinimaLocal = tabla[denominacionesLocal.length][cantidadLocal];
+
+            // Se obtiene el conjunto de monedas utilizadas.
+            int[] monedasUtilizadasLocal = encontrarMonedasUtilizadas(denominacionesLocal, tabla);
+
+            // Se imprime la cantidad mínima de monedas necesarias.
+            System.out.println("Cantidad mínima de monedas: " + cantidadMinimaLocal);
+
+            // Se imprime el conjunto de monedas utilizadas para alcanzar la cantidad mínima.
+            System.out.println("Monedas utilizadas: " + Arrays.toString(monedasUtilizadasLocal));
+
+            // Se llama al método para escribir la salida en el archivo.
+            escribirArchivoSalida("archivo_salida.txt", cantidadMinimaLocal, monedasUtilizadasLocal);
+
+        }
 
         // Verifica si se proporciona la opción de traza en la línea de comandos.
         if (args.length > 0) {
@@ -36,17 +63,16 @@ public class CambioMinimo {
             int[][] tabla = darCambio(cantidad, denominaciones, trazar);
 
             // Se imprime la cantidad mínima de monedas necesarias.
-            System.out.println("Cantidad mínima de monedas: " + tabla[denominaciones.length][cantidad]);
+            //System.out.println("Cantidad mínima de monedas: " + tabla[denominaciones.length][cantidad]);
 
             // Se imprime el conjunto de monedas utilizadas para alcanzar la cantidad mínima.
-            System.out.println("Monedas utilizadas: " + Arrays.toString(encontrarMonedasUtilizadas(denominaciones, tabla)));
+            //System.out.println("Monedas utilizadas: " + Arrays.toString(encontrarMonedasUtilizadas(denominaciones, tabla)));
         }
 
-        //INTRODUCIR ARGUMENTOS 
-        //if(args[0].equals("archivo_entrada.txt") && args[1].equals("archivo_salida.txt")){
+        //archivos de entrada y salida
         if (args.length == 2 && esNombreArchivoValido(args[0]) && esNombreArchivoValido(args[1])){
             // Se llama al método leerArchivoEntrada para obtener los datos del archivo.
-            DatosEntrada datosEntrada = leerArchivoEntrada("archivo_entrada.txt");
+            DatosEntrada datosEntrada = leerArchivoEntrada(args[0]);
 
             // Se obtienen los datos necesarios del objeto DatosEntrada.
             int numeroDeMonedas = datosEntrada.getNumeroDeMonedas();
@@ -69,7 +95,7 @@ public class CambioMinimo {
             System.out.println("Monedas utilizadas: " + Arrays.toString(monedasUtilizadas));
 
             // Se llama al método para escribir la salida en el archivo.
-            escribirArchivoSalida("archivo_salida.txt", cantidadMinima, monedasUtilizadas);
+            escribirArchivoSalida(args[1], cantidadMinima, monedasUtilizadas);
         }
     }
 
@@ -122,6 +148,7 @@ public class CambioMinimo {
 
     // Nuevo método para leer el archivo de entrada.
     public static DatosEntrada leerArchivoEntrada(String nombreArchivo) {
+        
         try (BufferedReader br = new BufferedReader(new FileReader(nombreArchivo))) {
             int numeroDeMonedas = Integer.parseInt(br.readLine());
             int[] denominaciones = Arrays.stream(br.readLine().split(" ")).mapToInt(Integer::parseInt).toArray();
