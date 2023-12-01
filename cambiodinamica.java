@@ -3,7 +3,7 @@ import java.io.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class CambioMinimo {
+class cambiodinamica {
 
     public static void main(String[] args) {
         
@@ -61,12 +61,6 @@ public class CambioMinimo {
 
             // Se llama al método darCambio para calcular la tabla dinámica.
             int[][] tabla = darCambio(cantidad, denominaciones, trazar);
-
-            // Se imprime la cantidad mínima de monedas necesarias.
-            //System.out.println("Cantidad mínima de monedas: " + tabla[denominaciones.length][cantidad]);
-
-            // Se imprime el conjunto de monedas utilizadas para alcanzar la cantidad mínima.
-            //System.out.println("Monedas utilizadas: " + Arrays.toString(encontrarMonedasUtilizadas(denominaciones, tabla)));
         }
 
         //archivos de entrada y salida
@@ -96,6 +90,29 @@ public class CambioMinimo {
 
             // Se llama al método para escribir la salida en el archivo.
             escribirArchivoSalida(args[1], cantidadMinima, monedasUtilizadas);
+        }else if(args.length == 1 && esNombreArchivoValido(args[0])){
+            // Se llama al método leerArchivoEntrada para obtener los datos del archivo.
+            DatosEntrada datosEntrada = leerArchivoEntrada(args[0]);
+
+            // Se obtienen los datos necesarios del objeto DatosEntrada.
+            int numeroDeMonedas = datosEntrada.getNumeroDeMonedas();
+            int[] denominaciones = datosEntrada.getDenominaciones();
+            int cantidad = datosEntrada.getCantidad();
+
+            // Se llama al método darCambio para calcular la tabla dinámica.
+            int[][] tabla = darCambio(cantidad, denominaciones, trazar);
+
+            // Se obtiene la cantidad mínima de monedas necesarias.
+            int cantidadMinima = tabla[denominaciones.length][cantidad];
+
+            // Se obtiene el conjunto de monedas utilizadas.
+            int[] monedasUtilizadas = encontrarMonedasUtilizadas(denominaciones, tabla);
+
+            // Se imprime la cantidad mínima de monedas necesarias.
+            System.out.println("Cantidad mínima de monedas: " + cantidadMinima);
+
+            // Se imprime el conjunto de monedas utilizadas para alcanzar la cantidad mínima.
+            System.out.println("Monedas utilizadas: " + Arrays.toString(monedasUtilizadas));
         }
     }
 
@@ -146,51 +163,58 @@ public class CambioMinimo {
         return tabla;
     }
 
-    // Nuevo método para leer el archivo de entrada.
+    // Método para leer el archivo de entrada.
     public static DatosEntrada leerArchivoEntrada(String nombreArchivo) {
-        
+        // Lee el archivo .txt en el try
         try (BufferedReader br = new BufferedReader(new FileReader(nombreArchivo))) {
             int numeroDeMonedas = Integer.parseInt(br.readLine());
             int[] denominaciones = Arrays.stream(br.readLine().split(" ")).mapToInt(Integer::parseInt).toArray();
             int cantidad = Integer.parseInt(br.readLine());
 
             return new DatosEntrada(numeroDeMonedas, denominaciones, cantidad);
+        // Lanza error en caso de no hacer match con el archivo de entrada
         } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    // Nueva clase para almacenar los datos de entrada.
+    // Clase para almacenar los datos de entrada y usarlo como tipo.
     public static class DatosEntrada {
         private int numeroDeMonedas;
         private int[] denominaciones;
         private int cantidad;
 
+        // Constructor de los datos de entrada
         public DatosEntrada(int numeroDeMonedas, int[] denominaciones, int cantidad) {
             this.numeroDeMonedas = numeroDeMonedas;
             this.denominaciones = denominaciones;
             this.cantidad = cantidad;
         }
 
+        // Devuelve el número de monedas
         public int getNumeroDeMonedas() {
             return numeroDeMonedas;
         }
 
+        // Devuelve la denominación de las monedas
         public int[] getDenominaciones() {
             return denominaciones;
         }
 
+        //Devuelve la cantidad a calcular
         public int getCantidad() {
             return cantidad;
         }
     }
 
+    // Método que imprime en pantalla la traza de las operaciones que se están haciendo
     public static void trazarAlgoritmo(int i, int j, int valor) {
         // Se imprime información detallada sobre la tabla para cada iteración si la traza está activada.
         System.out.println("Tabla[" + i + "][" + j + "] = " + valor);
     }
 
+    //Algoritmo en programación dinámica que resuelve el problema original del ejercicio
     public static int[] encontrarMonedasUtilizadas(int[] denominaciones, int[][] tabla) {
         // Se obtiene el número total de monedas utilizadas para alcanzar la cantidad mínima.
         int N = denominaciones.length;
@@ -216,15 +240,18 @@ public class CambioMinimo {
         return monedas;
     }
 
+    // Método que devuelve la ayuda para usar el programa en la terminal
     public static void imprimirAyuda() {
         // Se imprime información de ayuda sobre cómo utilizar el programa.
-        System.out.println("SINTAXIS: cambio-dinamica [-t][-h] [fichero entrada]");
+        System.out.println("SINTAXIS: cambiodinamica [-t][-h] [fichero entrada]");
+        System.out.println("SINTAXIS: cambiodinamica [-t][-h] [fichero entrada] [fichero salida]");
         System.out.println("-t Traza el algoritmo");
         System.out.println("-h Muestra esta ayuda");
         System.out.println("[fichero entrada] Nombre del fichero de entrada");
         System.out.println("[fichero salida] Nombre del fichero de salida");
     }
 
+    // Método que crea y escribe los resultados en el archivo de salida en formato .txt
     public static void escribirArchivoSalida(String nombreArchivo, int cantidadMinima, int[] monedasUtilizadas) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(nombreArchivo))) {
             // Se escribe la cantidad mínima en la primera línea.
@@ -243,9 +270,8 @@ public class CambioMinimo {
         }
     }
     
+    // Método en regex que valida el nombre y formato del archivo en *.txt
     private static boolean esNombreArchivoValido(String nombreArchivo) {
         return nombreArchivo.matches(".+\\.txt");
     }
-    
-
 }
